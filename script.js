@@ -54,7 +54,6 @@ $$('[data-profile]').forEach(button => button.addEventListener('click', () => {
 }));
 
 // EXPLORADOR DE CORRELATIVIDADES.
-// Requisitos cA/cR/rA tomados directamente del HTML original compartido.
 const subjects = Array.isArray(window.TIC_MATERIAS) ? window.TIC_MATERIAS : [];
 const subjectById = new Map(subjects.map(s => [Number(s.id), s]));
 const yearNames = { 1: '1.º año', 2: '2.º año', 3: '3.º año', 4: '4.º año' };
@@ -71,7 +70,7 @@ function setYear(year, { clearSearch = false } = {}) {
   if (clearSearch) { searchEl.value = ''; state.query = ''; }
   renderSubjects();
 }
-$$('.year-btn:not(.comp-btn)').forEach(button => button.addEventListener('click', () => setYear(button.dataset.year, { clearSearch: true })));
+$$('[data-year]').forEach(button => button.addEventListener('click', () => setYear(button.dataset.year, { clearSearch: true })));
 searchEl.addEventListener('input', () => { state.query = cleanSearch(searchEl.value); state.activeId = null; state.previousId = null; renderSubjects(); });
 
 function getVisibleSubjects() {
@@ -90,8 +89,6 @@ function requirementChips(ids, style) {
 }
 function detailMarkup(subject) {
   const req = subject.requirements;
-  // El HTML original incluye algunos IDs tanto en 'aprobadas' como 'regulares'.
-  // Cuando ya debe estar aprobada, no repetirla como mera regular en pantalla.
   const approved = [...new Set(req.cA.map(Number))];
   const regular = [...new Set(req.cR.map(Number))].filter(id => !approved.includes(id));
   const finals = [...new Set(req.rA.map(Number))];
@@ -103,7 +100,7 @@ function detailMarkup(subject) {
   <div class="req-block"><h4>Para rendir / promocionar · tener aprobadas</h4>${requirementChips(finals, 'exam')}</div></div>`;
 }
 function renderSubjects() {
-  $$('.year-btn:not(.comp-btn)').forEach(button => { const active = !state.query && state.year === button.dataset.year; button.classList.toggle('is-active',active); button.setAttribute('aria-pressed',String(active)); });
+  $$('[data-year]').forEach(button => { const active = !state.query && state.year === button.dataset.year; button.classList.toggle('is-active',active); button.setAttribute('aria-pressed',String(active)); });
   const visible = getVisibleSubjects();
   $('#subject-count').textContent = `${visible.length} ${visible.length === 1 ? 'materia' : 'materias'}`;
   if (!subjects.length) { listEl.innerHTML = '<div class="empty-subjects">No se pudo cargar el plan. Revisá los archivos de la carpeta assets.</div>'; return; }
